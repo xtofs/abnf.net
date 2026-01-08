@@ -166,6 +166,7 @@ public sealed class Parser(IEnumerable<Token> tokens, string? fileName = null)
     private AstNode.Expression ParseRepetition()
     {
         int? min = null, max = null;
+        bool hasRepetition = false;
         
         if (Match(TokenKind.Repeat))
         {
@@ -173,19 +174,34 @@ public sealed class Parser(IEnumerable<Token> tokens, string? fileName = null)
             var parts = repeatToken.Split('*');
             min = string.IsNullOrEmpty(parts[0]) ? (int?)null : int.Parse(parts[0]);
             max = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? int.Parse(parts[1]) : (int?)null;
+            hasRepetition = true;
+        }
+        else if (Match(TokenKind.Star))
+        {
+            // Standalone * means 0 or more (equivalent to *∞)
+            Expect(TokenKind.Star);
+            min = null;
+            max = null;
+            hasRepetition = true;
+        }
+        
+        // Skip whitespace after repetition operator
+        if (hasRepetition)
+        {
+            SkipTrivia();
         }
         
         var element = ParseElement();
         
-        if (min.HasValue || max.HasValue)
+        // If we consumed a repetition operator, wrap the element in a Repetition node
+        if (hasRepetition)
+        {
             return new AstNode.Expression.Repetition(min, max, element);
-        else
-            return element;
+        }
+        
+        return element;
     }
 
-    /// <summary>
-    /// Parses: element = rulename / group / option / char-val / num-val / prose-val
-    /// </summary>
     private AstNode.Expression ParseElement()
     {
         if (Match(TokenKind.RuleName))
@@ -287,7 +303,8 @@ public sealed class Parser(IEnumerable<Token> tokens, string? fileName = null)
                Match(TokenKind.ValueRange) || 
                Match(TokenKind.ProseVal) || 
                Match(TokenKind.Integer) ||
-               Match(TokenKind.Repeat);
+               Match(TokenKind.Repeat) ||
+               Match(TokenKind.Star); // Standalone * is also a repetition operator
     }
 }
 
