@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/bnf.net.Demo/bnf.net.Demo.csproj" />
+    <Project Path="samples/bnf.net.Interactive/bnf.net.Interactive.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/bnf.net/bnf.net.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/bnf.net.Tests/bnf.net.Tests.csproj" />
+  </Folder>
+</Solution>
