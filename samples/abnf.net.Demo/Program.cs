@@ -47,12 +47,12 @@ try
 
     // Validate example expressions
     Console.WriteLine("\nStep 3: Validating example expressions:");
-    Console.WriteLine("(Using structured ValidationResult API with line/column support)\n");
+    Console.WriteLine($"(Validating against start rule: '{grammar.FirstRule?.Name}')\n");
 
     var examples = new[] { "123", "+42", "-7", "1+2", "(1+2)*3", "+5*-3", "( 1 + 2 ) * 3", "1+", "(1+2", "%4", };
     foreach (var example in examples)
     {
-        var result = grammar.Validate(example, "expr");
+        var result = grammar.Validate(example);
         if (result.IsSuccess)
         {
             Console.WriteLine($"        {$"\"{example}\"",-20} → 🟢 Valid");

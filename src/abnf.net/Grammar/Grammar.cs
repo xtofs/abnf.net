@@ -7,8 +7,31 @@ namespace Abnf;
 public sealed class Grammar(IEnumerable<GrammarRule> rules)
 {
     private readonly Dictionary<string, GrammarRule> _rules = rules.ToDictionary(r => r.Name, r => r, StringComparer.OrdinalIgnoreCase);
+    
+    // private readonly List<GrammarRule> _ruleList = rules.ToList();
 
     public IReadOnlyCollection<GrammarRule> Rules => _rules.Values;
+
+    /// <summary>
+    /// Gets the first rule in the grammar, typically used as the start rule by convention.
+    /// </summary>
+    public GrammarRule? FirstRule => Rules.Count > 0 ? Rules.First() : null;
+
+    /// <summary>
+    /// Validates an input string against the first rule in the grammar (start rule by convention).
+    /// Returns a structured ValidationResult with error position and message.
+    /// </summary>
+    /// <param name="input">The input string to validate</param>
+    /// <returns>ValidationResult with success status, error position (0-based), and message</returns>
+    public ValidationResult Validate(string input)
+    {
+        if (FirstRule == null)
+        {
+            return ValidationResult.Failure(0, "Grammar has no rules");
+        }
+
+        return Validate(input, FirstRule.Name);
+    }
 
     /// <summary>
     /// Validates an input string against a specific rule in the grammar.
