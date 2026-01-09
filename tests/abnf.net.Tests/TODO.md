@@ -43,16 +43,45 @@ Add to the README.md a short excerpt about the goals and workings of the library
 
 
 ### test asserts
-We see a lot of this in the tests
+
+**✅ RESOLVED** - Extension methods already exist
+
+We have `GrammarExtensions.AssertValid()` and `GrammarExtensions.AssertInvalid()` that provide clean test assertions:
+
 ```csharp
-        var isValid = grammar.TryValidate("2*3", "term", out var errorPos, out var errorMsg);
-        Assert.True(isValid, $"Failed at position {errorPos}: {errorMsg}");
-```        
-what mechanism does xunit provide to write something equivalent to
-```
-     Assert.IsValidInput(grammar, "term", "2*3")
+// Instead of:
+var isValid = grammar.TryValidate("2*3", "term", out var errorPos, out var errorMsg);
+Assert.True(isValid, $"Failed at position {errorPos}: {errorMsg}");
+
+// Use:
+grammar.AssertValid("term", "2*3");
 ```
 
+The main test suite (`UnitTest1.cs`) already uses these. The `DebugValidationTests.cs` file uses the raw pattern for debugging purposes (to see actual error messages during development).
+
+**Available methods:**
+- `grammar.AssertValid(ruleName, input)` - Asserts input is valid
+- `grammar.AssertInvalid(ruleName, input, expectedPosition?)` - Asserts input is invalid, optionally at a specific position
+
 ### whitespace in demo
-My understanding is that ABNF is a bit picky with whitespace and has to have this explicitly encoded in the rules
-I don't want to change that behavior because I don't want to change ABNF but the grammar in the demo is then probably not very realistic
+
+**Issue:** Current demo grammar doesn't allow whitespace around operators
+
+The current grammar validates `"1+2"` but not `"1 + 2"`. This is correct ABNF behavior (whitespace must be explicitly defined), but might confuse users who expect typical programming language behavior.
+
+**Suggested improvement:** Add optional whitespace rules to make the demo more realistic:
+
+```abnf
+expr = term *( BWS ("+" / "-") BWS term )
+term = factor *( BWS ("*" / "/") BWS factor )
+factor = number / "(" BWS expr BWS ")"
+number = 1*DIGIT
+DIGIT = %x30-39
+BWS = *( SP / HTAB )  ; Bad WhiteSpace (optional)
+SP = %x20
+HTAB = %x09
+```
+
+This would accept both `"1+2"` and `"1 + 2"` while staying true to ABNF's explicit whitespace handling.
+
+Note: Not changing this now since the current demo clearly shows ABNF's explicit whitespace philosophy, which is an important learning point.
