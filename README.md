@@ -1,12 +1,33 @@
 # bnf.net
 
-A .NET library for working with BNF (Backus-Naur Form) grammars.
+A .NET library for working with [Backus-Naur Form](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form) grammars.
+
+## Overview
+
+This library provides comprehensive support for working with BNF grammars, with a current focus on [ABNF (Augmented Backus-Naur Form)](https://datatracker.ietf.org/doc/html/rfc5234). Future versions may include support for EBNF.
+
+**Key components:**
+
+1. **ABNF Parser** - Parse ABNF grammar definitions with a complete internal parse tree
+2. **Abstract Grammar Representation** - A recursive expression model consisting of:
+   - Alternation (`/`) - choose between alternatives
+   - Concatenation (space) - sequence of elements
+   - Repetition (`*`, `n*m`) - repeat elements
+   - Option (`[...]`) - optional elements
+   - Group (`(...)`) - grouping
+   - Literal - character values and ranges
+   - Rule - named grammar rules
+3. **Validation Engine** - Validate input strings against grammar rules with detailed error reporting (position and reason for failures)
+
+See the demo projects for practical examples of using the library.
 
 ## Projects
 
-- **bnf.net** - Core class library
-- **bnf.net.Demo** - Sample console application demonstrating library usage
-- **bnf.net.Tests** - Unit tests
+- **abnf.net** - Core class library
+- **abnf.net.Demo** - Basic arithmetic expression grammar demo
+- **abnf.net.DemoWithWhitespace** - Arithmetic grammar with optional whitespace support
+- **abnf.net.Interactive** - Interactive REPL for testing grammars
+- **abnf.net.Tests** - Unit tests
 
 ## Building
 
