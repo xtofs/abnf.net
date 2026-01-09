@@ -1,10 +1,10 @@
 # bnf.net
 
-A .NET library for working with [Backus-Naur Form](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form) grammars.
+A .NET library for working with [Augmented Backus-Naur Form](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form) grammars.
 
 ## Overview
 
-This library provides comprehensive support for working with BNF grammars, with a current focus on [ABNF (Augmented Backus-Naur Form)](https://datatracker.ietf.org/doc/html/rfc5234). Future versions may include support for EBNF.
+This library provides comprehensive support for working with ABNF grammars (https://datatracker.ietf.org/doc/html/rfc5234). Future versions may include support for EBNF.
 
 **Key components:**
 
