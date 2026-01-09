@@ -5,49 +5,31 @@
 
 ### Improve validation error reporting
 
-**Problem:** Current error messages are confusing and don't help users understand what went wrong in their input.
+**✅ COMPLETED** - Basic improvements implemented
 
-**Issues identified:**
+**What was fixed:**
 
-1. **Wrong error position reported**
-   - Reports the position where a rule *started* matching, not where it *failed*
-   - Example: `"(1+2"` reports "Error at position 0" but the actual problem is at position 4 (end of input)
+1. ✅ **Error position now reports actual failure point**
+   - Previously: Reports the position where a rule *started* matching
+   - Now: Reports the furthest position reached during parsing
+   - Positions are 1-based for user-friendly messages (internally 0-based)
+   - Example: `"(1+2"` now reports "Error at position 5" (not position 1)
 
-2. **Technical parser messages instead of user-friendly descriptions**
-   - "Expected at least 1 occurrences but found 0" - doesn't say what was expected (digits)
-   - "No alternative matched. Tried: ..." - exposes internal backtracking logic
-   - Users can't understand or act on these messages
+2. ✅ **Cleaner error messages**
+   - Previously: "No alternative matched. Tried: ... ; ... ; ..."
+   - Now: Reports only the most promising alternative (one that got furthest)
+   - Repetition errors now propagate the underlying cause instead of generic "Expected N occurrences"
 
-3. **Missing context**
-   - Doesn't connect related parts (e.g., "expected ')' to close '(' at position 0")
-   - Doesn't show what part of the grammar rule failed
+3. **Still TODO: Context tracking** (nice-to-have enhancement)
+   - Could add: "Unclosed parenthesis - expected ')' to close '(' at position 1"
+   - Would require tracking opening delimiters and matching pairs
+   - Current messages are clear enough for MVP
 
-**Current behavior:**
+**Example improvements achieved:**
 ```
-"(1+2" → Error at position 0: No alternative matched. Tried: Expected at least 1 occurrences but found 0; Expected ')' but reached end of input
+Before: "(1+2" → Error at position 1: No alternative matched. Tried: Expected at least 1 occurrences but found 0; Expected ')' but reached end of input
+After:  "(1+2" → Error at position 5: Expected ')' but reached end of input
 ```
-
-**Desired behavior:**
-```
-"(1+2" → Error at position 4: Expected ')' but reached end of input
-```
-
-Or even better:
-```
-"(1+2" → Error at position 4: Unclosed parenthesis - expected ')' to close '(' at position 0
-```
-
-**Implementation approach:**
-
-1. Track the **furthest position reached** during parsing (not just where rules start)
-2. Report errors at the **actual failure point** in the input
-3. Generate **human-readable messages** that describe what's wrong
-4. For alternations, report only the most promising alternative (furthest match) instead of listing all attempts
-5. Add context when relevant (matching pairs, what was expected based on grammar structure)
-
-**Files to modify:**
-- `src/bnf.net/Grammar/Grammar.cs` - validation logic
-- `src/bnf.net/Grammar/GrammarRule.cs` - pattern matching with better error tracking
 
 ### improve readme
 
@@ -70,3 +52,7 @@ what mechanism does xunit provide to write something equivalent to
 ```
      Assert.IsValidInput(grammar, "term", "2*3")
 ```
+
+### whitespace in demo
+My understanding is that ABNF is a bit picky with whitespace and has to have this explicitly encoded in the rules
+I don't want to change that behavior because I don't want to change ABNF but the grammar in the demo is then probably not very realistic
