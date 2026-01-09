@@ -82,6 +82,13 @@ private AstNode.Expression ParseRepetition()
 
 ## Testing Strategy
 
+### Test Organization
+- Use data-driven tests with `TheoryData<>` classes for comprehensive coverage
+- Centralize test grammars in a static `TestGrammars` class
+- Use raw string literals (`"""..."""`) for multi-line grammar definitions
+- Create test helper extensions (e.g., `grammar.AssertValid(rule, input)`) in test project
+- Each TheoryData row should include a descriptive name for test runner output
+
 ### Parser Testing
 - Test scanner tokenization separately from parser logic
 - Verify that token patterns match as expected (check regex order)
@@ -92,3 +99,10 @@ private AstNode.Expression ParseRepetition()
 - Separate pattern matching tests from conversion tests
 - Test AST-to-Grammar conversion independently
 - Validate end-to-end with realistic grammars (arithmetic expressions)
+
+## Library API Design
+
+### Convenience Methods
+- Provide `Abnf.Parse(string)` as a convenience wrapper for common use case
+- This combines Scanner.Scan() → Parser.ParseRuleList() → AstToGrammarConverter.ToGrammar()
+- Keep individual components accessible for advanced users who need granular control
