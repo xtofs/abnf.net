@@ -31,7 +31,7 @@ public static class AstToGrammarConverter
             AstNode.Expression.Concatenation concat => ConvertConcatenation(concat),
             AstNode.Expression.Repetition rep => ConvertRepetition(rep),
             AstNode.Expression.Group group => ConvertExpression(group.Inner),
-            AstNode.Expression.Option opt => new Pattern.Optional(ConvertExpression(opt.Inner)),
+            AstNode.Expression.Option opt => new Pattern.Repetition(ConvertExpression(opt.Inner), min: 0, max: 1),
             AstNode.Expression.Literal lit => new Pattern.Terminal(lit.Value, lit.IsCaseSensitive),
             AstNode.Expression.NumberVal num => ConvertNumberVal(num.Value),
             AstNode.Expression.RuleRef ruleRef => new Pattern.RuleReference(ruleRef.Name),

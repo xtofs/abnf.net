@@ -63,9 +63,6 @@ public static class SExpressionSerializer
             Pattern.Repetition repetition => 
                 FormatRepetition(repetition),
             
-            Pattern.Optional optional => 
-                $"(optional {optional.Element.ToSExpression()})",
-            
             _ => $"(unknown {pattern.GetType().Name})"
         };
     }
@@ -90,18 +87,10 @@ public static class SExpressionSerializer
 
     private static string FormatRepetition(Pattern.Repetition repetition)
     {
-        var bounds = (repetition.Min, repetition.Max) switch
-        {
-            (null, null) => "*",           // 0 or more
-            (0, null) => "*",              // 0 or more (explicit)
-            (1, null) => "+",              // 1 or more
-            (null, int max) => $"0-{max}", // 0 to max
-            (int min, null) => $"{min}+",  // min or more
-            (int min, int max) when min == max => $"{min}", // exactly min
-            (int min, int max) => $"{min}-{max}" // min to max
-        };
+        var minStr = repetition.Min?.ToString() ?? "0";
+        var maxStr = repetition.Max?.ToString() ?? "∞";
         
-        return $"(repeat {bounds} {repetition.Element.ToSExpression()})";
+        return $"(repeat {minStr} {maxStr} {repetition.Element.ToSExpression()})";
     }
 
     private static string FormatCharForSExpr(int value)

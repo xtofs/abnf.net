@@ -41,7 +41,7 @@ try
         "1 + 2",         // With whitespace
         "(1+2)*3",       // No whitespace in complex expression
         "( 1 + 2 ) * 3", // With whitespace everywhere
-        "(  1  +  2  )",  // Multiple spaces
+        "(  1  +  2  )", // Multiple spaces
         "1+",            // Invalid: incomplete
         "(1+2",          // Invalid: unclosed parenthesis
         "%4",            // Invalid: not a digit

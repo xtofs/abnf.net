@@ -15,6 +15,9 @@ public abstract class AstNode
         public Expression Expr { get; } = expr;
     }
 
+    /// <summary>
+    /// Represents an expression , the right hand side of a rule, in the ABNF AST.
+    /// 
     public abstract class Expression : AstNode
     {
         private Expression() { }

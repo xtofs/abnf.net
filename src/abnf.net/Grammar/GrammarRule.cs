@@ -317,24 +317,4 @@ public abstract class Pattern
             return MatchResult.Success(currentPosition);
         }
     }
-
-    /// <summary>
-    /// Optional pattern - matches zero or one occurrence of a pattern.
-    /// </summary>
-    public sealed class Optional : Pattern
-    {
-        public Pattern Element { get; }
-
-        public Optional(Pattern element)
-        {
-            Element = element;
-        }
-
-        public override MatchResult Match(string input, int position, GrammarContext context)
-        {
-            var result = Element.Match(input, position, context);
-            // Optional always succeeds, even if the element doesn't match
-            return result.IsSuccess ? result : MatchResult.Success(position);
-        }
-    }
 }
