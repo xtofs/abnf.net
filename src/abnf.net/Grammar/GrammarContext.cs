@@ -1,4 +1,4 @@
-namespace Bnf.Grammar;
+namespace Abnf;
 
 /// <summary>
 /// Context for grammar matching that tracks rule definitions and prevents infinite recursion.

@@ -1,8 +1,6 @@
-using Bnf.Parsing;
-using Bnf.Conversion;
-using Bnf.Grammar;
+using Abnf.Parsing;
 
-namespace bnf.net.Tests;
+namespace Abnf.Tests;
 
 public class DebugValidationTests
 {
@@ -83,7 +81,7 @@ DIGIT = %x30-39
         Assert.True(isValid, $"Failed at position {errorPos}: {errorMsg}");
     }
 
-    private Bnf.Grammar.Grammar CreateGrammar(string abnf)
+    private Grammar CreateGrammar(string abnf)
     {
         var tokens = Scanner.Scan(abnf);
         var parser = new Parser(tokens);

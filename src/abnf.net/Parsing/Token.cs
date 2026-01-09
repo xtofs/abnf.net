@@ -1,5 +1,5 @@
 using System.Globalization;
-namespace Bnf.Parsing;
+namespace Abnf.Parsing;
 
 public sealed class Token(TokenKind kind, string value, int line, int column)
 {

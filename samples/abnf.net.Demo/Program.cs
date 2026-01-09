@@ -1,4 +1,4 @@
-﻿using Bnf;
+using Abnf;
 
 Console.WriteLine("=== BNF.NET Demo ===");
 Console.WriteLine("This demo shows parsing ABNF grammar and validating strings against it.\n");
@@ -20,7 +20,7 @@ try
 {
     // Parse the ABNF grammar and convert to Grammar in one step
     Console.WriteLine("Step 1: Parsing ABNF grammar...");
-    var grammar = Abnf.Parse(abnfGrammar);
+    var grammar = global::Abnf.Abnf.Parse(abnfGrammar);
     Console.WriteLine($"        ✓ Successfully parsed {grammar.Rules.Count} rules");
 
     // Validate example expressions

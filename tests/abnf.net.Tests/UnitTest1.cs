@@ -1,8 +1,7 @@
-﻿using Bnf.Parsing;
-using Bnf.Conversion;
-using Bnf;
+using Abnf.Parsing;
+using Abnf;
 
-namespace bnf.net.Tests;
+namespace Abnf.Tests;
 
 /// <summary>
 /// Common ABNF grammar definitions used across tests
@@ -132,6 +131,7 @@ public class ValidationTests
     [ClassData(typeof(ValidInputTestData))]
     public void ValidateInput_ShouldSucceed(string grammarName, string abnf, string ruleName, string input)
     {
+        ArgumentException.ThrowIfNullOrEmpty(grammarName);
         var grammar = Abnf.Parse(abnf);
         grammar.AssertValid(ruleName, input);
     }
@@ -140,6 +140,7 @@ public class ValidationTests
     [ClassData(typeof(InvalidInputTestData))]
     public void ValidateInput_ShouldFail(string grammarName, string abnf, string ruleName, string input)
     {
+        ArgumentException.ThrowIfNullOrEmpty(grammarName);
         var grammar = Abnf.Parse(abnf);
         grammar.AssertInvalid(ruleName, input);
     }

@@ -1,19 +1,14 @@
-namespace Bnf.Grammar;
+namespace Abnf;
 
 /// <summary>
 /// Represents a complete grammar with multiple rules.
 /// Provides methods to validate strings against the grammar.
 /// </summary>
-public sealed class Grammar
+public sealed class Grammar(IEnumerable<GrammarRule> rules)
 {
-    private readonly Dictionary<string, GrammarRule> _rules;
+    private readonly Dictionary<string, GrammarRule> _rules = rules.ToDictionary(r => r.Name, r => r, StringComparer.OrdinalIgnoreCase);
 
     public IReadOnlyCollection<GrammarRule> Rules => _rules.Values;
-
-    public Grammar(IEnumerable<GrammarRule> rules)
-    {
-        _rules = rules.ToDictionary(r => r.Name, r => r, StringComparer.OrdinalIgnoreCase);
-    }
 
     /// <summary>
     /// Attempts to validate an input string against a specific rule in the grammar.

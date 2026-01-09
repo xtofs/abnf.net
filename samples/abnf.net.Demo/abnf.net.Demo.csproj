@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\bnf.net\bnf.net.csproj" />
+    <ProjectReference Include="..\..\src\abnf.net\abnf.net.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

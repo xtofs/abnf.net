@@ -1,9 +1,7 @@
-using Bnf.Ast;
-using Bnf.Grammar;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Bnf.Conversion;
+namespace Abnf.Parsing;
 
 /// <summary>
 /// Converts ABNF AST nodes into Grammar patterns for validation.
@@ -13,10 +11,10 @@ public static class AstToGrammarConverter
     /// <summary>
     /// Converts an AST RuleList into a Grammar.
     /// </summary>
-    public static Grammar.Grammar ToGrammar(AstNode.RuleList ruleList)
+    public static Grammar ToGrammar(AstNode.RuleList ruleList)
     {
         var grammarRules = ruleList.Rules.Select(ConvertRule).ToList();
-        return new Grammar.Grammar(grammarRules);
+        return new Grammar(grammarRules);
     }
 
     private static GrammarRule ConvertRule(AstNode.Rule rule)
@@ -77,7 +75,7 @@ public static class AstToGrammarConverter
 
         var rest = value.Substring(1);
         int numberBase;
-        
+
         if (rest.StartsWith("x", StringComparison.OrdinalIgnoreCase))
         {
             numberBase = 16;

@@ -1,4 +1,4 @@
-namespace Bnf.Grammar;
+namespace Abnf;
 
 /// <summary>
 /// Result of attempting to match a pattern against input.

@@ -1,7 +1,6 @@
-using Bnf.Parsing;
-using Bnf.Ast;
+using Abnf.Parsing;
 
-namespace bnf.net.Tests;
+namespace Abnf.Tests;
 
 public class ParserAbnfTests
 {

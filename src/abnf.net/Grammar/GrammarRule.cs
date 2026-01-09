@@ -1,4 +1,4 @@
-namespace Bnf.Grammar;
+namespace Abnf;
 
 /// <summary>
 /// Represents a grammar rule with its name and pattern for matching input strings.

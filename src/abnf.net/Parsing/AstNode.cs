@@ -1,4 +1,4 @@
-namespace Bnf.Ast;
+namespace Abnf.Parsing;
 
 public abstract class AstNode
 {

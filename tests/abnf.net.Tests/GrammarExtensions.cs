@@ -1,6 +1,4 @@
-using Bnf.Grammar;
-
-namespace bnf.net.Tests;
+namespace Abnf.Tests;
 
 /// <summary>
 /// Test helper extensions for Grammar validation assertions.

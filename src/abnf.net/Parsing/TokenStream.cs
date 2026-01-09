@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Bnf.Parsing;
+namespace Abnf.Parsing;
 
 /// <summary>
 /// Wraps an IEnumerable&lt;Token&gt; to provide lookahead capabilities for parsing.

@@ -1,4 +1,4 @@
-namespace Bnf.Parsing;
+namespace Abnf.Parsing;
 
 public enum TokenKind
 {

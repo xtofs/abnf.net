@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Bnf.Parsing;
+namespace Abnf.Parsing;
 
 public sealed partial class Scanner
 {

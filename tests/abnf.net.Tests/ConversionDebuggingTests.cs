@@ -1,9 +1,6 @@
-using Bnf.Parsing;
-using Bnf.Conversion;
-using Bnf.Grammar;
-using Bnf.Ast;
+using Abnf.Parsing;
 
-namespace bnf.net.Tests;
+namespace Abnf.Tests;
 
 public class ConversionDebuggingTests
 {

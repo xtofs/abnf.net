@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using Bnf.Ast;
 
-namespace Bnf.Parsing;
+namespace Abnf.Parsing;
 
 /// <summary>
 /// Clean implementation of ABNF parser based on the architecture documented in ARCHITECTURE.md

@@ -1,4 +1,4 @@
-﻿using Bnf;
+using Abnf;
 
 Console.WriteLine("=== BNF.NET Interactive Demo ===");
 Console.WriteLine("This is an interactive REPL for testing ABNF grammars.\n");
@@ -19,7 +19,7 @@ try
 {
     // Parse the ABNF grammar
     Console.WriteLine("Parsing ABNF grammar...");
-    var grammar = Abnf.Parse(defaultGrammar);
+    var grammar = global::Abnf.Abnf.Parse(defaultGrammar);
     Console.WriteLine($"✓ Successfully loaded grammar with {grammar.Rules.Count} rules");
     Console.WriteLine();
 
@@ -105,7 +105,7 @@ try
                         defaultGrammar = string.Join('\n', lines);
                         try
                         {
-                            grammar = Abnf.Parse(defaultGrammar);
+                            grammar = global::Abnf.Abnf.Parse(defaultGrammar);
                             Console.WriteLine($"✓ Successfully loaded new grammar with {grammar.Rules.Count} rules");
                             
                             // Reset start rule if it doesn't exist in new grammar
