@@ -27,6 +27,32 @@ public abstract class Pattern
     /// </summary>
     public abstract MatchResult Match(string input, int position, GrammarContext context);
 
+    /// <summary>
+    /// Formats a character value for display in error messages.
+    /// Printable characters (>= 32) are shown as characters, others as hex codes.
+    /// </summary>
+    protected static string FormatCharValue(int value)
+    {
+        if (value >= 32 && value <= 126)
+        {
+            return $"'{(char)value}' ({value:X})";
+        }
+        return $"{value:X}";
+    }
+
+    /// <summary>
+    /// Formats a character range for display in error messages.
+    /// Printable ranges are shown as characters, others as hex codes.
+    /// </summary>
+    protected static string FormatCharRange(int min, int max)
+    {
+        if (min >= 32 && max <= 126)
+        {
+            return $"'{(char)min}'-'{(char)max}' ({min:X}-{max:X})";
+        }
+        return $"{min:X}-{max:X}";
+    }
+
     private Pattern() { }
 
     /// <summary>
@@ -82,7 +108,7 @@ public abstract class Pattern
         {
             if (position >= input.Length)
             {
-                return MatchResult.Failure(position, $"Expected character in range [{MinValue:X}-{MaxValue:X}] but reached end of input");
+                return MatchResult.Failure(position, $"Expected character in range [{FormatCharRange(MinValue, MaxValue)}] but reached end of input");
             }
 
             var charValue = (int)input[position];
@@ -91,7 +117,7 @@ public abstract class Pattern
                 return MatchResult.Success(position + 1);
             }
 
-            return MatchResult.Failure(position, $"Expected character in range [{MinValue:X}-{MaxValue:X}] but found '{input[position]}' ({charValue:X})");
+            return MatchResult.Failure(position, $"Expected character in range [{FormatCharRange(MinValue, MaxValue)}] but found '{input[position]}' ({charValue:X})");
         }
     }
 
@@ -111,7 +137,7 @@ public abstract class Pattern
         {
             if (position >= input.Length)
             {
-                return MatchResult.Failure(position, $"Expected character {Value:X} but reached end of input");
+                return MatchResult.Failure(position, $"Expected character {FormatCharValue(Value)} but reached end of input");
             }
 
             var charValue = (int)input[position];
@@ -120,7 +146,7 @@ public abstract class Pattern
                 return MatchResult.Success(position + 1);
             }
 
-            return MatchResult.Failure(position, $"Expected character {Value:X} but found '{input[position]}' ({charValue:X})");
+            return MatchResult.Failure(position, $"Expected character {FormatCharValue(Value)} but found '{input[position]}' ({charValue:X})");
         }
     }
 

@@ -65,11 +65,9 @@ The main test suite (`UnitTest1.cs`) already uses these. The `DebugValidationTes
 
 ### whitespace in demo
 
-**Issue:** Current demo grammar doesn't allow whitespace around operators
+**✅ COMPLETED** - Created separate demo with whitespace support
 
-The current grammar validates `"1+2"` but not `"1 + 2"`. This is correct ABNF behavior (whitespace must be explicitly defined), but might confuse users who expect typical programming language behavior.
-
-**Suggested improvement:** Add optional whitespace rules to make the demo more realistic:
+**Solution:** Created a second demo project (`abnf.net.DemoWithWhitespace`) that shows the same arithmetic expression grammar but with explicit whitespace handling:
 
 ```abnf
 expr = term *( BWS ("+" / "-") BWS term )
@@ -82,6 +80,12 @@ SP = %x20
 HTAB = %x09
 ```
 
-This would accept both `"1+2"` and `"1 + 2"` while staying true to ABNF's explicit whitespace handling.
+This accepts both `"1+2"` and `"1 + 2"` while staying true to ABNF's explicit whitespace handling.
 
-Note: Not changing this now since the current demo clearly shows ABNF's explicit whitespace philosophy, which is an important learning point.
+**Key insight:** Having two demos side-by-side demonstrates ABNF's explicit whitespace philosophy:
+- `abnf.net.Demo` - Basic grammar without whitespace (validates `"1+2"` but rejects `"1 + 2"`)
+- `abnf.net.DemoWithWhitespace` - Grammar with optional whitespace rules (validates both)
+
+Run the demos:
+- `dotnet run --project samples/abnf.net.Demo`
+- `dotnet run --project samples/abnf.net.DemoWithWhitespace`

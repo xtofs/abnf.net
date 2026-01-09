@@ -25,23 +25,27 @@ try
 
     // Validate example expressions
     Console.WriteLine("\nStep 2: Validating example expressions:");
-    
-    var examples = new[] { "123", "1+2", "(1+2)*3", "1+", "(1+2" };
+    Console.WriteLine("(Using structured ValidationResult API with line/column support)\n");
+
+    var examples = new[] { "123", "1+2", "(1+2)*3", "( 1 + 2 ) * 3", "1+", "(1+2", "%4", };
     foreach (var example in examples)
     {
-        if (grammar.TryValidate(example, "expr", out var errorPos, out var errorMsg))
+        var result = grammar.Validate(example, "expr");
+        if (result.IsSuccess)
         {
             Console.WriteLine($"        ✓ \"{example}\" → Valid");
         }
         else
         {
-            Console.WriteLine($"        ✗ \"{example}\" → Error at position {errorPos}: {errorMsg}");
+            
+            var (line, column) = result.GetLineColumn(example);
+            Console.WriteLine($"        ✗ \"{example}\"  → Invalid");
+            Console.WriteLine($"           ({line}, {column}): {result.ErrorMessage}");
         }
     }
 
     Console.WriteLine("\nDemo completed successfully!");
-    Console.WriteLine("\nFor comprehensive tests, see the test project.");
-    Console.WriteLine("For interactive testing, run: dotnet run --project samples/bnf.net.Interactive");
+    Console.WriteLine("\nNote: This grammar does NOT allow whitespace around operators.");    
 }
 catch (Exception ex)
 {
