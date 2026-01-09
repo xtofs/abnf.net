@@ -3,11 +3,20 @@ namespace Bnf.Parsing;
 
 public sealed class Token(TokenKind kind, string value, int line, int column)
 {
+    
+    public TokenKind Kind { get; } = kind;
+    public string Value { get; } = value;
+    public int Line { get; } = line;
+    public int Column { get; } = column;
+
+
     /// <summary>
     /// Decodes the value of a Literal, NumberVal (percent notation), or ValueRange token to a string.
     /// Throws if not a supported kind.
     /// </summary>
-    public string StringValue()
+    /// <throws cref="InvalidOperationException">if Kind is not Literal, or NumberVal </throws>
+    /// 
+    public string GetStringValue()
     {
     if (Kind == TokenKind.CharVal || Kind == TokenKind.CaseSensitiveCharVal)
         {
@@ -39,10 +48,23 @@ public sealed class Token(TokenKind kind, string value, int line, int column)
         }
     throw new InvalidOperationException($"Token is not a CharVal, NumVal, or ValueRange: {Kind}");
     }
-    public TokenKind Kind { get; } = kind;
-    public string Value { get; } = value;
-    public int Line { get; } = line;
-    public int Column { get; } = column;
+
+    /// <summary>
+    /// Decodes the value of a Repeat token and give the repetition bounds (e.g., "*", "1*", "*5", "1*3").
+    /// Returns (min, max) where null for max means unbounded.
+    /// Throws if not a Repeat token.
+    /// </summary>
+    /// <throws cref="InvalidOperationException"></throws>
+    public (int? Min, int? Max) GetRepetitionBounds()
+    {
+        if (Kind != TokenKind.Repeat)
+            throw new InvalidOperationException($"Token is not a Repeat: {Kind}");
+
+        var parts = Value.Split('*');
+        var min = string.IsNullOrEmpty(parts[0]) ? (int?)null : int.Parse(parts[0]);
+        var max = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? int.Parse(parts[1]) : (int?)null;
+        return (min, max);
+    }
 
     public override string ToString() => $"{Kind} '{Value}' @ {Line}:{Column}";
 }

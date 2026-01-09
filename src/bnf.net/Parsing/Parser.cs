@@ -170,18 +170,8 @@ public sealed class Parser(IEnumerable<Token> tokens, string? fileName = null)
         
         if (Match(TokenKind.Repeat))
         {
-            var repeatToken = Expect(TokenKind.Repeat).Value;
-            var parts = repeatToken.Split('*');
-            min = string.IsNullOrEmpty(parts[0]) ? (int?)null : int.Parse(parts[0]);
-            max = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? int.Parse(parts[1]) : (int?)null;
-            hasRepetition = true;
-        }
-        else if (Match(TokenKind.Star))
-        {
-            // Standalone * means 0 or more (equivalent to *∞)
-            Expect(TokenKind.Star);
-            min = null;
-            max = null;
+            var repeatToken = Expect(TokenKind.Repeat);
+            (min, max) = repeatToken.GetRepetitionBounds();
             hasRepetition = true;
         }
         
@@ -222,18 +212,14 @@ public sealed class Parser(IEnumerable<Token> tokens, string? fileName = null)
         
         if (Match(TokenKind.CharVal))
         {
-            var value = Expect(TokenKind.CharVal).Value;
-            // Strip surrounding quotes
-            value = value.Trim('"');
-            return new AstNode.Expression.Literal(value, isCaseSensitive: false);
+            var token = Expect(TokenKind.CharVal);
+            return new AstNode.Expression.Literal(token.GetStringValue(), isCaseSensitive: false);
         }
 
         if (Match(TokenKind.CaseSensitiveCharVal))
         {
-            var value = Expect(TokenKind.CaseSensitiveCharVal).Value;
-            // Strip surrounding quotes
-            value = value.Trim('\'');
-            return new AstNode.Expression.Literal(value, isCaseSensitive: true);
+            var token = Expect(TokenKind.CaseSensitiveCharVal);
+            return new AstNode.Expression.Literal(token.GetStringValue(), isCaseSensitive: true);
         }
 
         if (Match(TokenKind.NumVal))
@@ -303,8 +289,7 @@ public sealed class Parser(IEnumerable<Token> tokens, string? fileName = null)
                Match(TokenKind.ValueRange) || 
                Match(TokenKind.ProseVal) || 
                Match(TokenKind.Integer) ||
-               Match(TokenKind.Repeat) ||
-               Match(TokenKind.Star); // Standalone * is also a repetition operator
+               Match(TokenKind.Repeat); // Repetition operator (including standalone *)
     }
 }
 

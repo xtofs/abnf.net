@@ -1,17 +1,16 @@
-﻿using Bnf.Parsing;
-using Bnf.Conversion;
+﻿using Bnf;
 
 Console.WriteLine("=== BNF.NET Interactive Demo ===");
 Console.WriteLine("This is an interactive REPL for testing ABNF grammars.\n");
 
 // Define a default ABNF grammar for basic arithmetic expressions
-var defaultGrammar = @"
-expr = term *( (""+"" / ""-"") term )
-term = factor *( (""*"" / ""/"") factor )
-factor = number / ""("" expr "")""
-number = 1*DIGIT
-DIGIT = %x30-39
-";
+var defaultGrammar = """
+    expr = term *( ("+" / "-") term )
+    term = factor *( ("*" / "/") factor )
+    factor = number / "(" expr ")"
+    number = 1*DIGIT
+    DIGIT = %x30-39
+    """;
 
 Console.WriteLine("Default ABNF Grammar (arithmetic expressions):");
 Console.WriteLine(defaultGrammar);
@@ -20,10 +19,7 @@ try
 {
     // Parse the ABNF grammar
     Console.WriteLine("Parsing ABNF grammar...");
-    var tokens = Scanner.Scan(defaultGrammar);
-    var parser = new Parser(tokens);
-    var ast = parser.ParseRuleList();
-    var grammar = AstToGrammarConverter.ToGrammar(ast);
+    var grammar = Abnf.Parse(defaultGrammar);
     Console.WriteLine($"✓ Successfully loaded grammar with {grammar.Rules.Count} rules");
     Console.WriteLine();
 
@@ -109,10 +105,7 @@ try
                         defaultGrammar = string.Join('\n', lines);
                         try
                         {
-                            var newTokens = Scanner.Scan(defaultGrammar);
-                            var newParser = new Parser(newTokens);
-                            var newAst = newParser.ParseRuleList();
-                            grammar = AstToGrammarConverter.ToGrammar(newAst);
+                            grammar = Abnf.Parse(defaultGrammar);
                             Console.WriteLine($"✓ Successfully loaded new grammar with {grammar.Rules.Count} rules");
                             
                             // Reset start rule if it doesn't exist in new grammar

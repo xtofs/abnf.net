@@ -3,6 +3,52 @@
 
 ## Features
 
+### Improve validation error reporting
+
+**Problem:** Current error messages are confusing and don't help users understand what went wrong in their input.
+
+**Issues identified:**
+
+1. **Wrong error position reported**
+   - Reports the position where a rule *started* matching, not where it *failed*
+   - Example: `"(1+2"` reports "Error at position 0" but the actual problem is at position 4 (end of input)
+
+2. **Technical parser messages instead of user-friendly descriptions**
+   - "Expected at least 1 occurrences but found 0" - doesn't say what was expected (digits)
+   - "No alternative matched. Tried: ..." - exposes internal backtracking logic
+   - Users can't understand or act on these messages
+
+3. **Missing context**
+   - Doesn't connect related parts (e.g., "expected ')' to close '(' at position 0")
+   - Doesn't show what part of the grammar rule failed
+
+**Current behavior:**
+```
+"(1+2" → Error at position 0: No alternative matched. Tried: Expected at least 1 occurrences but found 0; Expected ')' but reached end of input
+```
+
+**Desired behavior:**
+```
+"(1+2" → Error at position 4: Expected ')' but reached end of input
+```
+
+Or even better:
+```
+"(1+2" → Error at position 4: Unclosed parenthesis - expected ')' to close '(' at position 0
+```
+
+**Implementation approach:**
+
+1. Track the **furthest position reached** during parsing (not just where rules start)
+2. Report errors at the **actual failure point** in the input
+3. Generate **human-readable messages** that describe what's wrong
+4. For alternations, report only the most promising alternative (furthest match) instead of listing all attempts
+5. Add context when relevant (matching pairs, what was expected based on grammar structure)
+
+**Files to modify:**
+- `src/bnf.net/Grammar/Grammar.cs` - validation logic
+- `src/bnf.net/Grammar/GrammarRule.cs` - pattern matching with better error tracking
+
 ### improve readme
 
 Add to the README.md a short excerpt about the goals and workings of the library
@@ -14,9 +60,6 @@ Add to the README.md a short excerpt about the goals and workings of the library
 - and lastly the ability to validate that a string conforms with the syntax or shows the reason and position of the failure
 
 
-### cenvenience for standard use case
-let's add a convenience function "Parse" on a static "Abnf" class that does the steps in the CreateGrammar method line 83
-
 ### test asserts
 We see a lot of this in the tests
 ```csharp
@@ -25,5 +68,5 @@ We see a lot of this in the tests
 ```        
 what mechanism does xunit provide to write something equivalent to
 ```
-     Assert.Valid("2*3", "term")
+     Assert.IsValidInput(grammar, "term", "2*3")
 ```

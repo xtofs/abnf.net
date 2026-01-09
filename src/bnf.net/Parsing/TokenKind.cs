@@ -15,7 +15,6 @@ public enum TokenKind
     ValueRange, // value range notation, e.g. %x41-5A
     Equal,
     Slash,
-    Star,
     OpenParen,
     CloseParen,
     OpenBracket,

@@ -1,17 +1,16 @@
-﻿using Bnf.Parsing;
-using Bnf.Conversion;
+﻿using Bnf;
 
 Console.WriteLine("=== BNF.NET Demo ===");
 Console.WriteLine("This demo shows parsing ABNF grammar and validating strings against it.\n");
 
 // Define a simple ABNF grammar for basic arithmetic expressions
-var abnfGrammar = @"
-expr = term *( (""+"" / ""-"") term )
-term = factor *( (""*"" / ""/"") factor )
-factor = number / ""("" expr "")""
-number = 1*DIGIT
-DIGIT = %x30-39
-";
+var abnfGrammar = """
+    expr = term *( ("+" / "-") term )
+    term = factor *( ("*" / "/") factor )
+    factor = number / "(" expr ")"
+    number = 1*DIGIT
+    DIGIT = %x30-39
+    """;
 
 Console.WriteLine("ABNF Grammar:");
 Console.WriteLine(abnfGrammar);
@@ -19,22 +18,15 @@ Console.WriteLine();
 
 try
 {
-    // Parse the ABNF grammar
+    // Parse the ABNF grammar and convert to Grammar in one step
     Console.WriteLine("Step 1: Parsing ABNF grammar...");
-    var tokens = Scanner.Scan(abnfGrammar);
-    var parser = new Parser(tokens);
-    var ast = parser.ParseRuleList();
-    Console.WriteLine($"        ✓ Successfully parsed {ast.Rules.Count} rules");
-
-    // Convert AST to Grammar for validation
-    Console.WriteLine("\nStep 2: Converting AST to Grammar representation...");
-    var grammar = AstToGrammarConverter.ToGrammar(ast);
-    Console.WriteLine($"        ✓ Grammar created with {grammar.Rules.Count} rules");
+    var grammar = Abnf.Parse(abnfGrammar);
+    Console.WriteLine($"        ✓ Successfully parsed {grammar.Rules.Count} rules");
 
     // Validate example expressions
-    Console.WriteLine("\nStep 3: Validating example expressions:");
+    Console.WriteLine("\nStep 2: Validating example expressions:");
     
-    var examples = new[] { "123", "1+2", "(1+2)*3" };
+    var examples = new[] { "123", "1+2", "(1+2)*3", "1+", "(1+2" };
     foreach (var example in examples)
     {
         if (grammar.TryValidate(example, "expr", out var errorPos, out var errorMsg))

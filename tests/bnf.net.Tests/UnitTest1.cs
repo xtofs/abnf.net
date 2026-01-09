@@ -1,15 +1,39 @@
 ﻿using Bnf.Parsing;
 using Bnf.Conversion;
+using Bnf;
 
 namespace bnf.net.Tests;
+
+/// <summary>
+/// Common ABNF grammar definitions used across tests
+/// </summary>
+public static class TestGrammars
+{
+    public const string SimpleNumber = """
+        number = 1*DIGIT
+        DIGIT = %x30-39
+        """;
+    
+    public const string Arithmetic = """
+        expr = term *( ("+" / "-") term )
+        term = factor *( ("*" / "/") factor )
+        factor = number / "(" expr ")"
+        number = 1*DIGIT
+        DIGIT = %x30-39
+        """;
+
+    public const string HexValue = "rule = %x41";
+    public const string DecimalValue = "rule = %d65";
+    public const string CharacterRange = "rule = %x41-5A"; // A-Z
+    public const string CharacterConcatenation = "rule = %x41.42.43"; // ABC
+}
 
 public class ParserTests
 {
     [Fact]
     public void ParseSimpleGrammar()
     {
-        var abnf = "number = 1*DIGIT\nDIGIT = %x30-39";
-        var tokens = Scanner.Scan(abnf);
+        var tokens = Scanner.Scan(TestGrammars.SimpleNumber);
         var parser = new Parser(tokens);
         var ast = parser.ParseRuleList();
         
@@ -21,14 +45,7 @@ public class ParserTests
     [Fact]
     public void ParseArithmeticGrammar()
     {
-        var abnf = @"
-expr = term *( (""+"" / ""-"") term )
-term = factor *( (""*"" / ""/"") factor )
-factor = number / ""("" expr "")""
-number = 1*DIGIT
-DIGIT = %x30-39
-";
-        var tokens = Scanner.Scan(abnf);
+        var tokens = Scanner.Scan(TestGrammars.Arithmetic);
         var parser = new Parser(tokens);
         var ast = parser.ParseRuleList();
         
@@ -41,8 +58,7 @@ public class GrammarConversionTests
     [Fact]
     public void ConvertSimpleGrammar()
     {
-        var abnf = "number = 1*DIGIT\nDIGIT = %x30-39";
-        var tokens = Scanner.Scan(abnf);
+        var tokens = Scanner.Scan(TestGrammars.SimpleNumber);
         var parser = new Parser(tokens);
         var ast = parser.ParseRuleList();
         var grammar = AstToGrammarConverter.ToGrammar(ast);
@@ -51,139 +67,80 @@ public class GrammarConversionTests
     }
 }
 
-public class ValidationTests
+/// <summary>
+/// Test data for valid grammar validation cases
+/// </summary>
+public class ValidInputTestData : TheoryData<string, string, string, string>
 {
-    private Bnf.Grammar.Grammar CreateSimpleNumberGrammar()
+    public ValidInputTestData()
     {
-        var abnf = "number = 1*DIGIT\nDIGIT = %x30-39";
-        var tokens = Scanner.Scan(abnf);
-        var parser = new Parser(tokens);
-        var ast = parser.ParseRuleList();
-        return AstToGrammarConverter.ToGrammar(ast);
+        // Grammar Name, Grammar, Rule Name, Input
+        Add("SimpleNumber", TestGrammars.SimpleNumber, "number", "1");
+        Add("SimpleNumber", TestGrammars.SimpleNumber, "number", "123");
+        Add("SimpleNumber", TestGrammars.SimpleNumber, "number", "0");
+        Add("SimpleNumber", TestGrammars.SimpleNumber, "number", "999");
+        
+        Add("Arithmetic", TestGrammars.Arithmetic, "expr", "123");
+        Add("Arithmetic", TestGrammars.Arithmetic, "expr", "1+2");
+        Add("Arithmetic", TestGrammars.Arithmetic, "expr", "10*5+3");
+        Add("Arithmetic", TestGrammars.Arithmetic, "expr", "(1+2)*3");
+        Add("Arithmetic", TestGrammars.Arithmetic, "expr", "((1+2)*(3+4))/5");
+        
+        Add("HexValue", TestGrammars.HexValue, "rule", "A");
+        Add("DecimalValue", TestGrammars.DecimalValue, "rule", "A");
+        
+        Add("CharRange", TestGrammars.CharacterRange, "rule", "A");
+        Add("CharRange", TestGrammars.CharacterRange, "rule", "M");
+        Add("CharRange", TestGrammars.CharacterRange, "rule", "Z");
+        
+        Add("CharConcat", TestGrammars.CharacterConcatenation, "rule", "ABC");
     }
-
-    private Bnf.Grammar.Grammar CreateArithmeticGrammar()
-    {
-        var abnf = @"
-expr = term *( (""+"" / ""-"") term )
-term = factor *( (""*"" / ""/"") factor )
-factor = number / ""("" expr "")""
-number = 1*DIGIT
-DIGIT = %x30-39
-";
-        var tokens = Scanner.Scan(abnf);
-        var parser = new Parser(tokens);
-        var ast = parser.ParseRuleList();
-        return AstToGrammarConverter.ToGrammar(ast);
-    }
-
-    [Theory]
-    [InlineData("1")]
-    [InlineData("123")]
-    [InlineData("0")]
-    [InlineData("999")]
-    public void ValidateSimpleNumbers_Success(string input)
-    {
-        var grammar = CreateSimpleNumberGrammar();
-        var isValid = grammar.TryValidate(input, "number", out var errorPos, out var errorMsg);
-        Assert.True(isValid, $"Expected success for '{input}' but got error at position {errorPos}: {errorMsg}");
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("abc")]
-    [InlineData("1a")]
-    public void ValidateSimpleNumbers_Failure(string input)
-    {
-        var grammar = CreateSimpleNumberGrammar();
-        var isValid = grammar.TryValidate(input, "number", out _, out _);
-        Assert.False(isValid, $"Expected failure for '{input}' but got success");
-    }
-
-    [Theory]
-    [InlineData("123")]
-    [InlineData("1+2")]
-    [InlineData("10*5+3")]
-    [InlineData("(1+2)*3")]
-    [InlineData("((1+2)*(3+4))/5")]
-    public void ValidateArithmeticExpressions_Success(string input)
-    {
-        var grammar = CreateArithmeticGrammar();
-        var isValid = grammar.TryValidate(input, "expr", out var errorPos, out var errorMsg);
-        Assert.True(isValid, $"Expected success for '{input}' but got error at position {errorPos}: {errorMsg}");
-    }
-
-    [Theory]
-    [InlineData("abc")]
-    [InlineData("1+")]
-    [InlineData("(1+2")]
-    [InlineData("")]
-    [InlineData("+1")]
-    [InlineData("1 + 2")] // spaces not allowed in grammar
-    public void ValidateArithmeticExpressions_Failure(string input)
-    {
-        var grammar = CreateArithmeticGrammar();
-        var isValid = grammar.TryValidate(input, "expr", out _, out _);
-        Assert.False(isValid, $"Expected failure for '{input}' but got success");
-    }
-
 }
 
-public class CharacterValueTests
+/// <summary>
+/// Test data for invalid grammar validation cases
+/// </summary>
+public class InvalidInputTestData : TheoryData<string, string, string, string>
 {
-    [Fact]
-    public void ParseHexadecimalValue()
+    public InvalidInputTestData()
     {
-        var abnf = "rule = %x41";
-        var tokens = Scanner.Scan(abnf);
-        var parser = new Parser(tokens);
-        var ast = parser.ParseRuleList();
-        var grammar = AstToGrammarConverter.ToGrammar(ast);
+        // Grammar Name, Grammar, Rule Name, Input
+        Add("SimpleNumber", TestGrammars.SimpleNumber, "number", "");
+        Add("SimpleNumber", TestGrammars.SimpleNumber, "number", "abc");
+        Add("SimpleNumber", TestGrammars.SimpleNumber, "number", "1a");
+        
+        Add("Arithmetic", TestGrammars.Arithmetic, "expr", "abc");
+        Add("Arithmetic", TestGrammars.Arithmetic, "expr", "1+");
+        Add("Arithmetic", TestGrammars.Arithmetic, "expr", "(1+2");
+        Add("Arithmetic", TestGrammars.Arithmetic, "expr", "");
+        Add("Arithmetic", TestGrammars.Arithmetic, "expr", "+1");
+        Add("Arithmetic", TestGrammars.Arithmetic, "expr", "1 + 2"); // spaces not allowed
+        
+        Add("CharRange", TestGrammars.CharacterRange, "rule", "a");
+        Add("CharRange", TestGrammars.CharacterRange, "rule", "1");
+        
+        Add("CharConcat", TestGrammars.CharacterConcatenation, "rule", "AB");
+        Add("CharConcat", TestGrammars.CharacterConcatenation, "rule", "ABCD");
+    }
+}
 
-        var isValid = grammar.TryValidate("A", "rule", out var errorPos, out var errorMsg);
-        Assert.True(isValid, $"Expected success but got error at position {errorPos}: {errorMsg}");
+public class ValidationTests
+{
+    // private static Bnf.Grammar.Grammar ParseGrammar(string abnf) => Abnf.Parse(abnf);
+
+    [Theory]
+    [ClassData(typeof(ValidInputTestData))]
+    public void ValidateInput_ShouldSucceed(string grammarName, string abnf, string ruleName, string input)
+    {
+        var grammar = Abnf.Parse(abnf);
+        grammar.AssertValid(ruleName, input);
     }
 
-    [Fact]
-    public void ParseDecimalValue()
+    [Theory]
+    [ClassData(typeof(InvalidInputTestData))]
+    public void ValidateInput_ShouldFail(string grammarName, string abnf, string ruleName, string input)
     {
-        var abnf = "rule = %d65";
-        var tokens = Scanner.Scan(abnf);
-        var parser = new Parser(tokens);
-        var ast = parser.ParseRuleList();
-        var grammar = AstToGrammarConverter.ToGrammar(ast);
-
-        var isValid = grammar.TryValidate("A", "rule", out var errorPos, out var errorMsg);
-        Assert.True(isValid, $"Expected success but got error at position {errorPos}: {errorMsg}");
-    }
-
-    [Fact]
-    public void ParseCharacterRange()
-    {
-        var abnf = "rule = %x41-5A"; // A-Z
-        var tokens = Scanner.Scan(abnf);
-        var parser = new Parser(tokens);
-        var ast = parser.ParseRuleList();
-        var grammar = AstToGrammarConverter.ToGrammar(ast);
-
-        Assert.True(grammar.TryValidate("A", "rule", out _, out _));
-        Assert.True(grammar.TryValidate("M", "rule", out _, out _));
-        Assert.True(grammar.TryValidate("Z", "rule", out _, out _));
-        Assert.False(grammar.TryValidate("a", "rule", out _, out _));
-        Assert.False(grammar.TryValidate("1", "rule", out _, out _));
-    }
-
-    [Fact]
-    public void ParseCharacterConcatenation()
-    {
-        var abnf = "rule = %x41.42.43"; // ABC
-        var tokens = Scanner.Scan(abnf);
-        var parser = new Parser(tokens);
-        var ast = parser.ParseRuleList();
-        var grammar = AstToGrammarConverter.ToGrammar(ast);
-
-        Assert.True(grammar.TryValidate("ABC", "rule", out _, out _));
-        Assert.False(grammar.TryValidate("AB", "rule", out _, out _));
-        Assert.False(grammar.TryValidate("ABCD", "rule", out _, out _));
+        var grammar = Abnf.Parse(abnf);
+        grammar.AssertInvalid(ruleName, input);
     }
 }
