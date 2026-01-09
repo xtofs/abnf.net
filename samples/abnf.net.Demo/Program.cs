@@ -23,8 +23,12 @@ try
     var grammar = global::Abnf.Abnf.Parse(abnfGrammar);
     Console.WriteLine($"        ✓ Successfully parsed {grammar.Rules.Count} rules");
 
+    // Show the parsed grammar as S-expressions
+    Console.WriteLine("\nStep 2: Grammar Structure (S-expressions):");
+    Console.WriteLine(grammar.ToSExpression());
+
     // Validate example expressions
-    Console.WriteLine("\nStep 2: Validating example expressions:");
+    Console.WriteLine("\nStep 3: Validating example expressions:");
     Console.WriteLine("(Using structured ValidationResult API with line/column support)\n");
 
     var examples = new[] { "123", "1+2", "(1+2)*3", "( 1 + 2 ) * 3", "1+", "(1+2", "%4", };
