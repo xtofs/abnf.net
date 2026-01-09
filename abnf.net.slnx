@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/samples/">
     <Project Path="samples/abnf.net.Demo/abnf.net.Demo.csproj" />
+    <Project Path="samples/abnf.net.DemoWithWhitespace/abnf.net.DemoWithWhitespace.csproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/abnf.net/abnf.net.csproj" />
