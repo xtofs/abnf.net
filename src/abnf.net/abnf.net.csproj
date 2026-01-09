@@ -5,6 +5,26 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Abnf</RootNamespace>
+    
+    <!-- NuGet Package Metadata -->
+    <PackageId>Abnf.Net</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <Authors>xtofs</Authors>
+    <Company>xtofs</Company>
+    <Description>A .NET library for working with Augmented Backus-Naur Form (ABNF) grammars, parsing grammar files and validating input.</Description>
+    <PackageTags>abnf;bnf;parser;grammar;validation;rfc5234</PackageTags>
+    <PackageProjectUrl>https://github.com/xtofs/abnf.net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/xtofs/abnf.net</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>

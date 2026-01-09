@@ -41,6 +41,16 @@ dotnet build
 dotnet test
 ```
 
+## NuGet Package
+
+The library is available as a NuGet package: [Abnf.Net](https://www.nuget.org/packages/Abnf.Net)
+
+```bash
+dotnet add package Abnf.Net --prerelease
+```
+
+For package publishing and release information, see [docs/NUGET_PUBLISHING.md](docs/NUGET_PUBLISHING.md).
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
