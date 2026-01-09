@@ -24,9 +24,18 @@ See the demo projects for practical examples of using the library.
 ## Projects
 
 - **abnf.net** - Core class library
-- **abnf.net.Demo** - Basic arithmetic expression grammar demo
-- **abnf.net.DemoWithWhitespace** - Arithmetic grammar with optional whitespace support
+- **abnf.net.Demo** - Arithmetic expression grammar demo (run with `ws` argument for whitespace support)
 - **abnf.net.Tests** - Unit tests
+
+## Running the Demo
+
+```bash
+# Basic mode (no whitespace around operators)
+dotnet run --project samples/abnf.net.Demo
+
+# With whitespace support
+dotnet run --project samples/abnf.net.Demo -- ws
+```
 
 ## Building
 

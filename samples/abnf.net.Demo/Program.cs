@@ -1,16 +1,34 @@
 using Abnf;
 
-Console.WriteLine("=== BNF.NET Demo ===");
-Console.WriteLine("This demo shows parsing ABNF grammar and validating strings against it.\n");
+// Check for whitespace mode argument
+var allowWhitespace = args.Length > 0 && args[0].ToLower() is "ws" or "whitespace" or "--whitespace";
 
-// Define a simple ABNF grammar for basic arithmetic expressions
-var abnfGrammar = """
-    expr = term *( ("+" / "-") term )
-    term = factor *( ("*" / "/") factor )
-    factor = number / "(" expr ")"
-    number = 1*DIGIT
-    DIGIT = %x30-39
-    """;
+Console.WriteLine("=== ABNF.NET Demo ===");
+Console.WriteLine($"Mode: {(allowWhitespace ? "Allow Whitespace in input" : "No whitespace in input allowed")}\n");
+
+// Define ABNF grammar - with or without whitespace support
+var abnfGrammar = allowWhitespace switch
+{
+    true => """
+        expr = term *( OWS ("+" / "-") OWS term )
+        term = factor *( OWS ("*" / "/") OWS factor )
+        factor = [sign] number / "(" OWS expr OWS ")"
+        number = 1*DIGIT
+        sign = "+" / "-"
+        DIGIT = %x30-39
+        OWS = *( SP / HTAB )
+        SP = %x20
+        HTAB = %x09
+        """,
+    false => """
+        expr = term *( ("+" / "-") term )
+        term = factor *( ("*" / "/") factor )
+        factor = [sign] number / "(" expr ")"
+        number = 1*DIGIT
+        sign = "+" / "-"
+        DIGIT = %x30-39
+        """
+};
 
 Console.WriteLine("ABNF Grammar:");
 Console.WriteLine(abnfGrammar);
@@ -31,7 +49,7 @@ try
     Console.WriteLine("\nStep 3: Validating example expressions:");
     Console.WriteLine("(Using structured ValidationResult API with line/column support)\n");
 
-    var examples = new[] { "123", "1+2", "(1+2)*3", "( 1 + 2 ) * 3", "1+", "(1+2", "%4", };
+    var examples = new[] { "123", "+42", "-7", "1+2", "(1+2)*3", "+5*-3", "( 1 + 2 ) * 3", "1+", "(1+2", "%4", };
     foreach (var example in examples)
     {
         var result = grammar.Validate(example, "expr");
@@ -41,14 +59,24 @@ try
         }
         else
         {
-            
+
             var (line, column) = result.GetLineColumn(example);
             Console.WriteLine($"        {$"\"{example}\"",-20} → 🔴 Invalid ({line}, {column}): {result.ErrorMessage}");
         }
     }
 
     Console.WriteLine("\nDemo completed successfully!");
-    Console.WriteLine("\nNote: This grammar does NOT allow whitespace around operators.");    
+
+    if (allowWhitespace)
+    {
+        Console.WriteLine("\nKey insight: ABNF requires explicit whitespace handling.");
+        Console.WriteLine("The OWS rule allows optional spaces and tabs around operators.");
+    }
+    else
+    {
+        Console.WriteLine("\nNote: This grammar does NOT allow whitespace around operators.");
+        Console.WriteLine("Run with 'ws' argument to see whitespace-aware version.");
+    }
 }
 catch (Exception ex)
 {

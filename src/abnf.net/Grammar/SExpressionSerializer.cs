@@ -42,8 +42,8 @@ public static class SExpressionSerializer
         {
             Pattern.Terminal terminal => 
                 terminal.IsCaseSensitive 
-                    ? $"(terminal \"{Escape(terminal.Value)}\")"
-                    : $"(terminal-ci \"{Escape(terminal.Value)}\")",
+                    ? $"(terminal-cs \"{Escape(terminal.Value)}\")"
+                    : $"(terminal \"{Escape(terminal.Value)}\")",
             
             Pattern.CharacterValue charValue => 
                 $"(char {FormatCharForSExpr(charValue.Value)})",
