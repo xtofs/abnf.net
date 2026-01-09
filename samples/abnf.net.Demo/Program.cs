@@ -33,14 +33,13 @@ try
         var result = grammar.Validate(example, "expr");
         if (result.IsSuccess)
         {
-            Console.WriteLine($"        ✅ \"{example}\" → Valid");
+            Console.WriteLine($"        ✓ \"{example}\" → Valid");
         }
         else
         {
             
             var (line, column) = result.GetLineColumn(example);
-            Console.WriteLine($"        ❌ \"{example}\"  → Invalid");
-            Console.WriteLine($"           ({line}, {column}): {result.ErrorMessage}");
+            Console.WriteLine($"        🔴  ({line}, {column}): {result.ErrorMessage}");
         }
     }
 
