@@ -209,7 +209,7 @@ public abstract class Pattern
 
         public override MatchResult Match(string input, int position, GrammarContext context)
         {
-            var failures = new List<string>();
+            MatchResult? furthestFailure = null;
 
             foreach (var alternative in Alternatives)
             {
@@ -218,10 +218,16 @@ public abstract class Pattern
                 {
                     return result;
                 }
-                failures.Add(result.ErrorMessage);
+                
+                // Track the alternative that got furthest
+                if (furthestFailure == null || result.FurthestPosition > furthestFailure.FurthestPosition)
+                {
+                    furthestFailure = result;
+                }
             }
 
-            return MatchResult.Failure(position, $"No alternative matched. Tried: {string.Join("; ", failures)}");
+            // Report the error from the alternative that got furthest (most promising)
+            return furthestFailure ?? MatchResult.Failure(position, "No alternatives provided");
         }
     }
 
@@ -247,12 +253,14 @@ public abstract class Pattern
             var count = 0;
             var minCount = Min ?? 0;
             var maxCount = Max ?? int.MaxValue;
+            MatchResult? lastFailure = null;
 
             while (count < maxCount)
             {
                 var result = Element.Match(input, currentPosition, context);
                 if (!result.IsSuccess)
                 {
+                    lastFailure = result;
                     break;
                 }
                 currentPosition = result.Position;
@@ -267,6 +275,16 @@ public abstract class Pattern
 
             if (count < minCount)
             {
+                // If we have a failure, use its message (more specific than "expected N occurrences")
+                if (lastFailure != null)
+                {
+                    return MatchResult.FailureWithFurthest(
+                        position, 
+                        lastFailure.FurthestErrorMessage, 
+                        lastFailure.FurthestPosition, 
+                        lastFailure.FurthestErrorMessage);
+                }
+                
                 return MatchResult.Failure(position, $"Expected at least {minCount} occurrences but found {count}");
             }
 
