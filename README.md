@@ -26,7 +26,6 @@ See the demo projects for practical examples of using the library.
 - **abnf.net** - Core class library
 - **abnf.net.Demo** - Basic arithmetic expression grammar demo
 - **abnf.net.DemoWithWhitespace** - Arithmetic grammar with optional whitespace support
-- **abnf.net.Interactive** - Interactive REPL for testing grammars
 - **abnf.net.Tests** - Unit tests
 
 ## Building
